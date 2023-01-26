@@ -68,34 +68,24 @@
             },
             watch: {
                 search: function(newVal, oldVal) {
-                    if (newVal != '') {
-                        this.articles = axios
-                            .post('http://localhost/api/articles/search', {
-                                params:{
-                                    search: newVal,
-                                    sort: this.sort
-                                }
-                            })
-                            .then(response => (this.articles = response));
-                    }
-                    if (newVal == '') {
-                        this.articles = axios
-                            .post('http://localhost/api/articles')
-                            .then(response => (this.articles = response));
-                    }
+                    this.articles = axios
+                        .post('http://localhost/api/articles/search', {
+                            params: {
+                                search: newVal,
+                                sort: this.sort
+                            }
+                        })
+                        .then(response => (this.articles = response));
                 },
                 sort: function(newVal, oldVal) {
-                    console.log(newVal);
-                    if (newVal != '') {
-                        this.articles = axios
-                            .post('http://localhost/api/articles/search', {
-                                params:{
-                                    search: this.search,
-                                    sort: newVal
-                                }
-                            })
-                            .then(response => (this.articles = response));
-                    }
+                    this.articles = axios
+                        .post('http://localhost/api/articles/search', {
+                            params: {
+                                search: this.search,
+                                sort: newVal
+                            }
+                        })
+                        .then(response => (this.articles = response));
                 }
             },
             mounted() {

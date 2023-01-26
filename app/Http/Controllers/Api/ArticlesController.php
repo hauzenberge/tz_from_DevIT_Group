@@ -12,38 +12,38 @@ class ArticlesController extends Controller
     public function index()
     {
         $articles = Article::all()
-        ->map(function($item){
-            return [
-                'id' => $item->id,
-                'title' => $item->title,
-                'text' => $item->text
-            ];
-        });
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'text' => $item->text
+                ];
+            });
         return $articles;
     }
 
     public function search(Request $request)
     {
-        //dd($request->input('params'));
+        $search = $request->input('params')['search'];
+        if ($search != null) {
+            $query = Article::where('id', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%')
+                ->orWhere('text', 'like', '%' . $search . '%');
+        } else $query = Article::where('id', '!=', '%' . $search . '%');
         $sort = $request->input('params')['sort'];
-        if ($sort == null ) {
+        if ($sort == null) {
             $sort = 'id';
         }
-        //dd($sort);
-        $search = $request->input('params')['search'];
-        //dd($search);
-        $articles = Article::where('id', 'like', '%'.$search.'%')
-        ->orWhere('title', 'like', '%'.$search.'%')
-        ->orWhere('text', 'like', '%'.$search.'%')
-        ->get()
-        ->sortBy($sort)
-        ->map(function($item){
-            return [
-                'id' => $item->id,
-                'title' => $item->title,
-                'text' => $item->text
-            ];
-        });
+        $articles = $query
+            ->get()
+            ->sortBy($sort)
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'text' => $item->text
+                ];
+            });
         return $articles;
     }
 }
