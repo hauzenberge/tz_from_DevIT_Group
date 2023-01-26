@@ -90,6 +90,7 @@
                 }
             },
             mounted() {
+                this.url = window.location.href;
                 this.articles = axios
                     .post(this.url + 'api/articles',)
                     .then(response => (this.articles = response));

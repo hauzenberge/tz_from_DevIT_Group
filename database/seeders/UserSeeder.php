@@ -15,10 +15,20 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::insert([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => bcrypt('admin'),
-        ]);
+        $items = [
+            [
+                'name' => 'Admin',
+                'role' => 'Administrator',
+                'email' => 'admin@admin.com',
+                'password' => bcrypt('admin'),
+            ],
+            [
+                'name' => 'Author',
+                'role' => 'Author',
+                'email' => 'author@admin.com',
+                'password' => bcrypt('admin'),
+            ]
+        ];
+        User::insert($items);
     }
 }

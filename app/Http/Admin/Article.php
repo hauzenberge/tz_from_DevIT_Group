@@ -8,6 +8,7 @@ use AdminDisplay;
 use AdminForm;
 use AdminFormElement;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
 use SleepingOwl\Admin\Contracts\Initializable;
@@ -56,27 +57,32 @@ class Article extends Section implements Initializable
      */
     public function onDisplay($payload = [])
     {
+        // dd(Auth::user()->role);
         $columns = [
             AdminColumn::text('id', '#')->setWidth('50px')->setHtmlAttribute('class', 'text-center'),
-            AdminColumn::link('title', 'Title', 'text', 'Text', 'created_at')
-                ->setSearchCallback(function($column, $query, $search){
-                    return $query
-                        ->orWhere('title', 'like', '%'.$search.'%')
-                        ->orWhere('created_at', 'like', '%'.$search.'%')
-                    ;
+            AdminColumn::link('title', 'Title', 'created_at')
+                ->setSearchCallback(function ($column, $query, $search) {
+                    if (Auth::user()->role == "Author") {
+                        return $query
+                            ->where('user_id', Auth::user()->id)
+                            ->orWhere('title', 'like', '%' . $search . '%')
+                            ->orWhere('text', 'like', '%' . $search . '%')
+                            ->orWhere('created_at', 'like', '%' . $search . '%');
+                    } else  return $query
+                        ->orWhere('title', 'like', '%' . $search . '%')
+                        ->orWhere('text', 'like', '%' . $search . '%')
+                        ->orWhere('created_at', 'like', '%' . $search . '%');
                 })
-                ->setOrderable(function($query, $direction) {
+                ->setOrderable(function ($query, $direction) {
                     $query->orderBy('created_at', $direction);
-                })
-            ,
-            AdminColumn::boolean('name', 'On'),
+                }),
+           // AdminColumn::boolean('name', 'On'),
             AdminColumn::text('created_at', 'Created / updated', 'updated_at')
                 ->setWidth('160px')
-                ->setOrderable(function($query, $direction) {
+                ->setOrderable(function ($query, $direction) {
                     $query->orderBy('updated_at', $direction);
                 })
-                ->setSearchable(false)
-            ,
+                ->setSearchable(false),
         ];
 
         $display = AdminDisplay::datatables()
@@ -85,22 +91,19 @@ class Article extends Section implements Initializable
             ->setDisplaySearch(true)
             ->paginate(25)
             ->setColumns($columns)
-            ->setHtmlAttribute('class', 'table-primary table-hover th-center')
-        ;
+            ->setHtmlAttribute('class', 'table-primary table-hover th-center');
 
         $display->setColumnFilters([
             AdminColumnFilter::select()
                 ->setModelForOptions(\App\Models\Article::class, 'name')
-                ->setLoadOptionsQueryPreparer(function($element, $query) {
+                ->setLoadOptionsQueryPreparer(function ($element, $query) {
                     return $query;
                 })
                 ->setDisplay('name')
                 ->setColumnName('name')
-                ->setPlaceholder('All names')
-            ,
+                ->setPlaceholder('All names'),
         ]);
         $display->getColumnFilters()->setPlacement('card.heading');
-
         return $display;
     }
 
@@ -115,21 +118,19 @@ class Article extends Section implements Initializable
         $form = AdminForm::card()->addBody([
             AdminFormElement::columns()->addColumn([
                 AdminFormElement::text('title', 'Title')
-                    ->required()
-                ,
-                AdminFormElement::text('text', 'Text')
-                    ->required()
-                ,
+                    ->required(),
+                AdminFormElement::wysiwyg('text', 'Text')
+                    ->required(),
+                AdminFormElement::html('<hr>'),
+                AdminFormElement::text('user_id', 'User ID')
+                    //->value(Auth::user()->id)
+                    ->required(),
                 AdminFormElement::html('<hr>'),
                 AdminFormElement::datetime('created_at')
                     ->setVisible(true)
-                    ->setReadonly(false)
-                ,
+                    ->setReadonly(false),
                 AdminFormElement::html('last AdminFormElement without comma')
-            ], 'col-xs-12 col-sm-6 col-md-4 col-lg-4')->addColumn([
-                AdminFormElement::text('id', 'ID')->setReadonly(true),
-                AdminFormElement::html('last AdminFormElement without comma')
-            ], 'col-xs-12 col-sm-6 col-md-8 col-lg-8'),
+            ], ),
         ]);
 
         $form->getButtons()->setButtons([

@@ -30,6 +30,24 @@ return [
         'icon'  => 'fas fa-tachometer-alt',
         'url'   => route('admin.dashboard'),
     ],
+
+    (new Page(\App\Models\Article::class))
+    ->setTitle('Article')
+    ->setPriority(10000)
+    ->setAccessLogic(function(Page $page){
+        if ((auth()->user()->role == 'Administrator') or (auth()->user()->role == 'Author')) {
+            return true;
+        }
+    }),
+
+    (new Page(\App\Models\User::class))
+    ->setTitle('User')
+    ->setPriority(10000)
+    ->setAccessLogic(function(Page $page){
+        if (auth()->user()->role == 'Administrator') {
+            return true;
+        }
+    }),
  /*
     [
         'title' => 'Information',

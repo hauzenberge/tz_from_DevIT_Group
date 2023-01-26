@@ -16,7 +16,7 @@ class AdminSectionsServiceProvider extends ServiceProvider
        // \App\Role::class => 'App\Http\Admin\Roles',
 
        \App\Models\Article::class => 'App\Http\Admin\Article',
-        \App\Models\User::class => 'App\Http\Admin\Users',
+       \App\Models\User::class => 'App\Http\Admin\Users',
     ];
 
     /**
