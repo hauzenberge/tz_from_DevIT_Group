@@ -64,12 +64,13 @@
             data: {
                 articles: '',
                 search: '',
-                sort: ''
+                sort: '', 
+                usr: '', 
             },
             watch: {
                 search: function(newVal, oldVal) {
                     this.articles = axios
-                        .post('http://localhost/api/articles/search', {
+                        .post(this.url + 'api/articles/search', {
                             params: {
                                 search: newVal,
                                 sort: this.sort
@@ -79,7 +80,7 @@
                 },
                 sort: function(newVal, oldVal) {
                     this.articles = axios
-                        .post('http://localhost/api/articles/search', {
+                        .post( this.url + 'api/articles/search', {
                             params: {
                                 search: this.search,
                                 sort: newVal
@@ -90,7 +91,7 @@
             },
             mounted() {
                 this.articles = axios
-                    .post('http://localhost/api/articles')
+                    .post(this.url + 'api/articles',)
                     .then(response => (this.articles = response));
             }
         })
